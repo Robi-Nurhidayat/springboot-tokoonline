@@ -1,0 +1,11 @@
+
+services:
+    database:
+      image: postgres:16-alpine
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: root
+        POSTGRES_USER: root
+        POSTGRES_DB: toko_online
+      ports:
+        - "5432:5432"

@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: toko-online
+  datasource:
+    url: jdbc:postgresql://localhost:5432/toko_online
+    username: root
+    password: root
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true

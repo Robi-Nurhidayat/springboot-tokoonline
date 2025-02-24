@@ -13,12 +13,29 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
 
     private static final String UPLOAD_DIR = "uploads/";
+
+    @Override
+    public List<Product> getAll() {
+
+        List<Product> products = productRepository.findAll().stream().map(product -> {
+            String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/")
+                    .path(product.getImage())
+                    .toUriString();
+            product.setImage(imageUrl);
+            return product;
+        }).collect(Collectors.toList());
+
+        return products;
+    }
+
     @Override
     public Product create(MultipartFile image, ProductDTO productDTO) {
        Path path = Paths.get(UPLOAD_DIR + image.getOriginalFilename());
@@ -57,11 +74,5 @@ public class ProductServiceImpl implements IProductService {
     }
 
     private final ProductRepository productRepository;
-    @Override
-    public List<Product> getAll() {
 
-        List<Product> products = productRepository.findAll();
-
-        return products;
-    }
 }

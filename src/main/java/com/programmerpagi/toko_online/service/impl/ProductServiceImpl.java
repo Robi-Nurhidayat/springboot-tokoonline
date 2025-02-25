@@ -78,8 +78,21 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public Product delete(Long id) {
-        return null;
+    public void delete(Long id) {
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Product not found")
+        );
+        Path imageUrl = Paths.get(UPLOAD_DIR).resolve(product.getImage());
+
+        if(Files.exists(imageUrl)) {
+            try {
+                Files.delete(imageUrl);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        productRepository.deleteById(id);
     }
 
     private final ProductRepository productRepository;

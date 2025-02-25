@@ -65,7 +65,16 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public Product findById(Long id) {
-        return null;
+
+        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+
+        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/uploads/")
+                .path(product.getImage()).toUriString();
+        product.setImage(imageUrl);
+
+
+        return product;
     }
 
     @Override

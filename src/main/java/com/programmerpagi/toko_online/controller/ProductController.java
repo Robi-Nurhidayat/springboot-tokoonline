@@ -27,6 +27,15 @@ public class ProductController {
 
     }
 
+    @GetMapping("/products/{id}")
+    public ResponseEntity<ResponseDTO> findById(@PathVariable Long id) {
+
+        Product product = productService.findById(id);
+
+        return ResponseEntity.status(200).body(new ResponseDTO(200, "Success", product));
+
+    }
+
     @PostMapping("/products")
     public ResponseEntity<ResponseDTO> create(@RequestParam("image")MultipartFile image, @ModelAttribute ProductDTO productDTO) {
 

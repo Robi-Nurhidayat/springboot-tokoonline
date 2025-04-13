@@ -1,6 +1,7 @@
 package com.programmerpagi.toko_online.controller;
 
-import com.programmerpagi.toko_online.dto.ProductDTO;
+import com.programmerpagi.toko_online.dto.ProductRequestDTO;
+import com.programmerpagi.toko_online.dto.ProductResponseDTO;
 import com.programmerpagi.toko_online.dto.ResponseDTO;
 import com.programmerpagi.toko_online.model.Product;
 import com.programmerpagi.toko_online.service.IProductService;
@@ -21,7 +22,7 @@ public class ProductController {
     @GetMapping("/products")
     public ResponseEntity<ResponseDTO> getAllProduct() {
 
-        List<Product> products = productService.getAll();
+        List<ProductResponseDTO> products = productService.getAll();
 
         return ResponseEntity.status(200).body(new ResponseDTO(200, "Success", products));
 
@@ -30,17 +31,17 @@ public class ProductController {
     @GetMapping("/products/{id}")
     public ResponseEntity<ResponseDTO> findById(@PathVariable Long id) {
 
-        Product product = productService.findById(id);
+        ProductResponseDTO product = productService.findById(id);
 
         return ResponseEntity.status(200).body(new ResponseDTO(200, "Success", product));
 
     }
 
     @PostMapping("/products")
-    public ResponseEntity<ResponseDTO> create(@RequestParam("image")MultipartFile image, @ModelAttribute ProductDTO productDTO) {
+    public ResponseEntity<ResponseDTO> create(@RequestParam("image")MultipartFile image, @ModelAttribute ProductRequestDTO productRequestDTO) {
 
 
-        Product product = productService.create(image, productDTO);
+        ProductResponseDTO product = productService.create(image, productRequestDTO);
 
         return ResponseEntity.status(200).body(new ResponseDTO(200, "Success", product));
 

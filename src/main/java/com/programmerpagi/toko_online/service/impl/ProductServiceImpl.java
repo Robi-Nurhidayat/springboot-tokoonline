@@ -1,6 +1,8 @@
 package com.programmerpagi.toko_online.service.impl;
 
-import com.programmerpagi.toko_online.dto.ProductDTO;
+import com.programmerpagi.toko_online.dto.ProductRequestDTO;
+import com.programmerpagi.toko_online.dto.ProductResponseDTO;
+import com.programmerpagi.toko_online.exception.ResourceNotFoundException;
 import com.programmerpagi.toko_online.model.Product;
 import com.programmerpagi.toko_online.repository.ProductRepository;
 import com.programmerpagi.toko_online.service.IProductService;
@@ -22,22 +24,31 @@ public class ProductServiceImpl implements IProductService {
     private static final String UPLOAD_DIR = "uploads/";
 
     @Override
-    public List<Product> getAll() {
+    public List<ProductResponseDTO> getAll() {
 
-        List<Product> products = productRepository.findAll().stream().map(product -> {
+        List<ProductResponseDTO> products = productRepository.findAll().stream().map(product -> {
             String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/uploads/")
                     .path(product.getImage())
                     .toUriString();
-            product.setImage(imageUrl);
-            return product;
+
+            ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+            productResponseDTO.setId(product.getId());
+            productResponseDTO.setNama(product.getNama());
+            productResponseDTO.setKategori(product.getKategori());
+            productResponseDTO.setHarga(product.getHarga());
+            productResponseDTO.setStok(product.getStok());
+            productResponseDTO.setDeskripsi(product.getDeskripsi());
+            productResponseDTO.setImage(imageUrl);
+
+            return productResponseDTO;
         }).collect(Collectors.toList());
 
         return products;
     }
 
     @Override
-    public Product create(MultipartFile image, ProductDTO productDTO) {
+    public ProductResponseDTO create(MultipartFile image, ProductRequestDTO productRequestDTO) {
        Path path = Paths.get(UPLOAD_DIR + image.getOriginalFilename());
         try {
             image.transferTo(path);
@@ -47,11 +58,11 @@ public class ProductServiceImpl implements IProductService {
 
 
         Product product = new Product();
-        product.setNama(productDTO.getNama());
-        product.setKategori(productDTO.getKategori());
-        product.setHarga(productDTO.getHarga());
-        product.setStok(productDTO.getStok());
-        product.setDeskripsi(productDTO.getDeskripsi());
+        product.setNama(productRequestDTO.getNama());
+        product.setKategori(productRequestDTO.getKategori());
+        product.setHarga(productRequestDTO.getHarga());
+        product.setStok(productRequestDTO.getStok());
+        product.setDeskripsi(productRequestDTO.getDeskripsi());
         product.setImage(image.getOriginalFilename());
         productRepository.save(product);
 
@@ -59,28 +70,44 @@ public class ProductServiceImpl implements IProductService {
                 .path("/uploads/")
                 .path(product.getImage())
                 .toUriString();
-        product.setImage(imageUrl);
-        return product;
+
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+        productResponseDTO.setId(product.getId());
+        productResponseDTO.setNama(product.getNama());
+        productResponseDTO.setKategori(product.getKategori());
+        productResponseDTO.setHarga(product.getHarga());
+        productResponseDTO.setStok(product.getStok());
+        productResponseDTO.setDeskripsi(product.getDeskripsi());
+        productResponseDTO.setImage(imageUrl);
+        return productResponseDTO;
     }
 
     @Override
-    public Product findById(Long id) {
+    public ProductResponseDTO findById(Long id) {
 
-        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("product","id", Long.toString(id)));
 
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/uploads/")
                 .path(product.getImage()).toUriString();
-        product.setImage(imageUrl);
+
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+        productResponseDTO.setId(product.getId());
+        productResponseDTO.setNama(product.getNama());
+        productResponseDTO.setKategori(product.getKategori());
+        productResponseDTO.setHarga(product.getHarga());
+        productResponseDTO.setStok(product.getStok());
+        productResponseDTO.setDeskripsi(product.getDeskripsi());
+        productResponseDTO.setImage(imageUrl);
 
 
-        return product;
+        return productResponseDTO;
     }
 
     @Override
     public void delete(Long id) {
         Product product = productRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Product not found")
+                () -> new ResourceNotFoundException("product","id",Long.toString(id))
         );
         Path imageUrl = Paths.get(UPLOAD_DIR).resolve(product.getImage());
 

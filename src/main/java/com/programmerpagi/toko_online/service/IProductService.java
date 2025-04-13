@@ -1,6 +1,7 @@
 package com.programmerpagi.toko_online.service;
 
-import com.programmerpagi.toko_online.dto.ProductDTO;
+import com.programmerpagi.toko_online.dto.ProductRequestDTO;
+import com.programmerpagi.toko_online.dto.ProductResponseDTO;
 import com.programmerpagi.toko_online.model.Product;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,10 +9,10 @@ import java.util.List;
 
 public interface IProductService {
 
-    List<Product> getAll();
-    Product create(MultipartFile image, ProductDTO productDTO);
+    List<ProductResponseDTO> getAll();
+    ProductResponseDTO create(MultipartFile image, ProductRequestDTO productDTO);
 
-    Product findById(Long id);
+    ProductResponseDTO findById(Long id);
 
     void delete(Long id);
 }

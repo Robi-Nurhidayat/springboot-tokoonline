@@ -1,9 +1,11 @@
 package com.programmerpagi.toko_online.service.impl;
 
+import com.programmerpagi.toko_online.dto.RegisterResponseDTO;
 import com.programmerpagi.toko_online.model.User;
 import com.programmerpagi.toko_online.repository.UserRepository;
 import com.programmerpagi.toko_online.service.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,10 +13,20 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     @Override
-    public User registerUser(User user) {
+    public RegisterResponseDTO registerUser(User user) {
+
+        String passwordEncode = passwordEncoder.encode(user.getPassword());
+        user.setPassword(passwordEncode);
         User newUser = userRepository.save(user);
 
-        return newUser;
+        RegisterResponseDTO registerResponseDTO = new RegisterResponseDTO();
+        registerResponseDTO.setId(newUser.getId());
+        registerResponseDTO.setName(newUser.getName());
+        registerResponseDTO.setEmail(newUser.getEmail());
+        registerResponseDTO.setRole(newUser.getRole());
+
+        return registerResponseDTO;
     }
 }

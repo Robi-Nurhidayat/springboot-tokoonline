@@ -1,5 +1,6 @@
 package com.programmerpagi.toko_online.config;
 
+import com.programmerpagi.toko_online.exception.ResourceNotFoundException;
 import com.programmerpagi.toko_online.model.User;
 import com.programmerpagi.toko_online.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.lang.module.ResolutionException;
 import java.util.List;
 
 @Service
@@ -20,7 +22,7 @@ public class LoadUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         User findUser = userRepository.findByEmail(username).orElseThrow(
-                () -> new UsernameNotFoundException("User not found")
+                () -> new ResourceNotFoundException("User", "email", username)
         );
 
         List<GrantedAuthority> authorities = List.of(

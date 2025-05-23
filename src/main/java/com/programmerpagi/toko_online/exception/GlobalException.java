@@ -50,4 +50,16 @@ public class GlobalException extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
     }
+
+    @ExceptionHandler(PasswordUsernameNotMatches.class)
+    public ResponseEntity<ErrorResponseDTO> passwordUsernameNotMatches(PasswordUsernameNotMatches exception, WebRequest webRequest) {
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setApiPath(webRequest.getDescription(false));
+        errorResponseDTO.setErrorCode(HttpStatus.BAD_REQUEST);
+        errorResponseDTO.setErrorMessage(exception.getMessage());
+        errorResponseDTO.setErrorTime(LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
+    }
 }

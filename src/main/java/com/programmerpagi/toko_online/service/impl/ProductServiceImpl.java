@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,22 +49,24 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public ProductResponseDTO create(MultipartFile image, ProductRequestDTO productRequestDTO) {
-       Path path = Paths.get(UPLOAD_DIR + image.getOriginalFilename());
+    public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
+       Path path = Paths.get(UPLOAD_DIR + productRequestDTO.getImage().getOriginalFilename());
         try {
-            image.transferTo(path);
+            productRequestDTO.getImage().transferTo(path);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
+        String uuid = UUID.randomUUID().toString();
+        String imageName = uuid + productRequestDTO.getImage().getOriginalFilename();
         Product product = new Product();
         product.setNama(productRequestDTO.getNama());
         product.setKategori(productRequestDTO.getKategori());
         product.setHarga(productRequestDTO.getHarga());
         product.setStok(productRequestDTO.getStok());
         product.setDeskripsi(productRequestDTO.getDeskripsi());
-        product.setImage(image.getOriginalFilename());
+        product.setImage(imageName);
         productRepository.save(product);
 
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()

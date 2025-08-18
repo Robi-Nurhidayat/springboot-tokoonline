@@ -28,47 +28,21 @@ import java.util.Arrays;
 public class ProjectSecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        CsrfTokenRequestAttributeHandler requestAttributeHandler = new CsrfTokenRequestAttributeHandler();
-        requestAttributeHandler.setCsrfRequestAttributeName("_csrf");
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 
-        http.cors(cors -> cors.configurationSource(new CorsConfigurationSource() {
-            @Override
-            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                CorsConfiguration corsConfiguration = new CorsConfiguration();
-                corsConfiguration.setAllowedOrigins(Arrays.asList("*"));
-                corsConfiguration.setAllowedMethods(Arrays.asList("*"));
-                corsConfiguration.setAllowedHeaders(Arrays.asList("*"));
-                return corsConfiguration;
-            }
-        }));
+//        httpSecurity.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//        httpSecurity.addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class);
 
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        http.csrf(csrf -> csrf.
-                        csrfTokenRequestHandler(requestAttributeHandler)
-                        .ignoringRequestMatchers("/api/v1/register","/api/v1/login")
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-
+        // authentication
+        httpSecurity.authorizeHttpRequests(auth ->
+       auth.anyRequest().permitAll()
                 );
-        http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
-//        http.addFilterAfter(new JWTTokenGenerator(), BasicAuthenticationFilter.class);
-        http.addFilterBefore(new JWTTokenValidator(), BasicAuthenticationFilter.class);
-//        http.authorizeHttpRequests((auth) -> auth.anyRequest().permitAll());
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/api/v1/login","/api/v1/register").permitAll());
-        // products
-        http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers(HttpMethod.GET,"/api/v1/products","/api/v1/products/**").permitAll()
-                .requestMatchers(HttpMethod.POST,"/api/v1/products").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT,"/api/v1/products/**").authenticated()
-                .requestMatchers(HttpMethod.DELETE,"/api/v1/products/**").authenticated());
 
+        // disable csrf
+        httpSecurity.csrf(csrfConfigurer -> csrfConfigurer.disable());
 
-
-//        http.httpBasic(Customizer.withDefaults());
-       return http.build();
+        return httpSecurity.build();
     }
-
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -76,12 +50,10 @@ public class ProjectSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder){
-
+    AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         CustomUsernamePwdAuthenticationProvider authenticationProvider = new CustomUsernamePwdAuthenticationProvider(userDetailsService,passwordEncoder);
         ProviderManager providerManager = new ProviderManager(authenticationProvider);
         providerManager.setEraseCredentialsAfterAuthentication(false);
         return providerManager;
-
     }
 }

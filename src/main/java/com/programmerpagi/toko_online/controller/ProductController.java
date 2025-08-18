@@ -38,10 +38,10 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<ResponseDTO> create(@RequestParam("image")MultipartFile image, @ModelAttribute ProductRequestDTO productRequestDTO) {
+    public ResponseEntity<ResponseDTO> create(@ModelAttribute ProductRequestDTO productRequestDTO) {
 
 
-        ProductResponseDTO product = productService.create(image, productRequestDTO);
+        ProductResponseDTO product = productService.create(productRequestDTO);
 
         return ResponseEntity.status(200).body(new ResponseDTO(200, "Success", product));
 

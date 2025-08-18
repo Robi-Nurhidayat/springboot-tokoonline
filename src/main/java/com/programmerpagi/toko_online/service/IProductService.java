@@ -10,7 +10,7 @@ import java.util.List;
 public interface IProductService {
 
     List<ProductResponseDTO> getAll();
-    ProductResponseDTO create(MultipartFile image, ProductRequestDTO productDTO);
+    ProductResponseDTO create(ProductRequestDTO productDTO);
 
     ProductResponseDTO findById(Long id);
 

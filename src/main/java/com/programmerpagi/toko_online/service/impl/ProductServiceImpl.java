@@ -50,16 +50,11 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
-       Path path = Paths.get(UPLOAD_DIR + productRequestDTO.getImage().getOriginalFilename());
-        try {
-            productRequestDTO.getImage().transferTo(path);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
 
 
         String uuid = UUID.randomUUID().toString();
-        String imageName = uuid + productRequestDTO.getImage().getOriginalFilename();
+        String imageName = uuid + productRequestDTO.getImage().getOriginalFilename().replaceAll("\\s+", "_");
         Product product = new Product();
         product.setNama(productRequestDTO.getNama());
         product.setKategori(productRequestDTO.getKategori());
@@ -69,9 +64,18 @@ public class ProductServiceImpl implements IProductService {
         product.setImage(imageName);
         productRepository.save(product);
 
+        if (!productRequestDTO.getImage().isEmpty() || productRequestDTO.getImage() != null) {
+            Path path = Paths.get(UPLOAD_DIR + imageName);
+            try {
+                productRequestDTO.getImage().transferTo(path);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/uploads/")
-                .path(product.getImage())
+                .path(imageName)
                 .toUriString();
 
         ProductResponseDTO productResponseDTO = new ProductResponseDTO();

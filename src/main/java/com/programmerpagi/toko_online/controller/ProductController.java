@@ -47,6 +47,16 @@ public class ProductController {
 
     }
 
+    @PutMapping("/products/{id}")
+    public ResponseEntity<ResponseDTO> update(@ModelAttribute ProductRequestDTO productRequestDTO,@PathVariable Long id) {
+
+
+        ProductResponseDTO product = productService.create(productRequestDTO);
+
+        return ResponseEntity.status(200).body(new ResponseDTO(200, "Success", product));
+
+    }
+
     @DeleteMapping("/products/{id}")
     public ResponseEntity<ResponseDTO> delete(@PathVariable Long id) {
 

@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
 
+
     private static final String UPLOAD_DIR = "uploads/";
 
     @Override
@@ -49,12 +50,42 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
+    public ProductResponseDTO findById(Long id) {
+
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("product","id", Long.toString(id)));
+
+        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/uploads/")
+                .path(product.getImage()).toUriString();
+
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+        productResponseDTO.setId(product.getId());
+        productResponseDTO.setNama(product.getNama());
+        productResponseDTO.setKategori(product.getKategori());
+        productResponseDTO.setHarga(product.getHarga());
+        productResponseDTO.setStok(product.getStok());
+        productResponseDTO.setDeskripsi(product.getDeskripsi());
+        productResponseDTO.setImage(imageUrl);
+
+
+        return productResponseDTO;
+    }
+
+
+    @Override
     public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
 
 
 
+        String imageName = "";
         String uuid = UUID.randomUUID().toString();
-        String imageName = uuid + productRequestDTO.getImage().getOriginalFilename().replaceAll("\\s+", "_");
+        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
+            imageName = uuid + "_" + productRequestDTO.getImage().getOriginalFilename().replaceAll("\\s+", "_");
+        }else {
+            imageName = uuid + "_produk.jpg";
+        }
+
+
         Product product = new Product();
         product.setNama(productRequestDTO.getNama());
         product.setKategori(productRequestDTO.getKategori());
@@ -64,10 +95,11 @@ public class ProductServiceImpl implements IProductService {
         product.setImage(imageName);
         productRepository.save(product);
 
-        if (!productRequestDTO.getImage().isEmpty() || productRequestDTO.getImage() != null) {
-            Path path = Paths.get(UPLOAD_DIR + imageName);
+        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path targetPath = uploadPath.resolve(imageName);
             try {
-                productRequestDTO.getImage().transferTo(path);
+                productRequestDTO.getImage().transferTo(targetPath);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -90,26 +122,19 @@ public class ProductServiceImpl implements IProductService {
     }
 
     @Override
-    public ProductResponseDTO findById(Long id) {
+    public ProductResponseDTO update(ProductRequestDTO productRequestDTO, Long id) {
 
-        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("product","id", Long.toString(id)));
-
-        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/uploads/")
-                .path(product.getImage()).toUriString();
-
-        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
-        productResponseDTO.setId(product.getId());
-        productResponseDTO.setNama(product.getNama());
-        productResponseDTO.setKategori(product.getKategori());
-        productResponseDTO.setHarga(product.getHarga());
-        productResponseDTO.setStok(product.getStok());
-        productResponseDTO.setDeskripsi(product.getDeskripsi());
-        productResponseDTO.setImage(imageUrl);
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("product", "id", Long.toString(id))
+        );
 
 
-        return productResponseDTO;
+
+
+
+        return null;
     }
+
 
     @Override
     public void delete(Long id) {

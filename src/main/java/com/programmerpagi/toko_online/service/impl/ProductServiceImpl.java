@@ -6,6 +6,7 @@ import com.programmerpagi.toko_online.exception.ResourceNotFoundException;
 import com.programmerpagi.toko_online.model.Product;
 import com.programmerpagi.toko_online.repository.ProductRepository;
 import com.programmerpagi.toko_online.service.IProductService;
+import com.programmerpagi.toko_online.utils.ImageFileNameUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,8 +23,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements IProductService {
 
-
     private static final String UPLOAD_DIR = "uploads/";
+    private final ProductRepository productRepository;
 
     @Override
     public List<ProductResponseDTO> getAll() {
@@ -76,14 +77,7 @@ public class ProductServiceImpl implements IProductService {
     public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
 
 
-
-        String imageName = "";
-        String uuid = UUID.randomUUID().toString();
-        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
-            imageName = uuid + "_" + productRequestDTO.getImage().getOriginalFilename().replaceAll("\\s+", "_");
-        }else {
-            imageName = uuid + "_produk.jpg";
-        }
+        String imageName = ImageFileNameUtil.generate(productRequestDTO.getImage());
 
 
         Product product = new Product();
@@ -128,11 +122,55 @@ public class ProductServiceImpl implements IProductService {
                 () -> new ResourceNotFoundException("product", "id", Long.toString(id))
         );
 
+        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
+            Path imageUrl = Paths.get(UPLOAD_DIR).resolve(product.getImage());
+
+            System.out.println("blok ini di eksekusi");
+            if(Files.exists(imageUrl)) {
+                try {
+                    Files.delete(imageUrl);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
+        String imageName = "";
+        String uuid = UUID.randomUUID().toString();
+        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
+            imageName = uuid + "_" + productRequestDTO.getImage().getOriginalFilename().replaceAll("\\s+", "_");
+        }else {
+            imageName = uuid + "_produk.jpg";
+        }
 
 
 
 
-        return null;
+        product.setNama(productRequestDTO.getNama());
+        product.setKategori(productRequestDTO.getKategori());
+        product.setHarga(productRequestDTO.getHarga());
+        product.setStok(productRequestDTO.getStok());
+        product.setDeskripsi(productRequestDTO.getDeskripsi());
+        product.setImage(imageName);
+        productRepository.save(product);
+
+
+
+        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/uploads/")
+                .path(imageName)
+                .toUriString();
+
+        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
+        productResponseDTO.setId(product.getId());
+        productResponseDTO.setNama(product.getNama());
+        productResponseDTO.setKategori(product.getKategori());
+        productResponseDTO.setHarga(product.getHarga());
+        productResponseDTO.setStok(product.getStok());
+        productResponseDTO.setDeskripsi(product.getDeskripsi());
+        productResponseDTO.setImage(imageUrl);
+        return productResponseDTO;
     }
 
 
@@ -154,6 +192,6 @@ public class ProductServiceImpl implements IProductService {
         productRepository.deleteById(id);
     }
 
-    private final ProductRepository productRepository;
+
 
 }

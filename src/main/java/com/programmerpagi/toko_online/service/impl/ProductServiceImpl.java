@@ -7,6 +7,7 @@ import com.programmerpagi.toko_online.model.Product;
 import com.programmerpagi.toko_online.repository.ProductRepository;
 import com.programmerpagi.toko_online.service.IProductService;
 import com.programmerpagi.toko_online.utils.ImageFileNameUtil;
+import com.programmerpagi.toko_online.utils.ImageSaveUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -76,9 +77,7 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
 
-
         String imageName = ImageFileNameUtil.generate(productRequestDTO.getImage());
-
 
         Product product = new Product();
         product.setNama(productRequestDTO.getNama());
@@ -88,6 +87,9 @@ public class ProductServiceImpl implements IProductService {
         product.setDeskripsi(productRequestDTO.getDeskripsi());
         product.setImage(imageName);
         productRepository.save(product);
+
+        // untuk menyimpan gambar
+//        ImageSaveUtil.save(UPLOAD_DIR,productRequestDTO.getImage(),imageName);
 
         if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
             Path uploadPath = Paths.get(UPLOAD_DIR);
@@ -122,6 +124,7 @@ public class ProductServiceImpl implements IProductService {
                 () -> new ResourceNotFoundException("product", "id", Long.toString(id))
         );
 
+        System.out.println("isi id : " + product.getId());
         if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
             Path imageUrl = Paths.get(UPLOAD_DIR).resolve(product.getImage());
 
@@ -154,6 +157,16 @@ public class ProductServiceImpl implements IProductService {
         product.setDeskripsi(productRequestDTO.getDeskripsi());
         product.setImage(imageName);
         productRepository.save(product);
+
+        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            Path targetPath = uploadPath.resolve(imageName);
+            try {
+                productRequestDTO.getImage().transferTo(targetPath);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
 
 

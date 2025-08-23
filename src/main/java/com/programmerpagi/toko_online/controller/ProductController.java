@@ -51,7 +51,7 @@ public class ProductController {
     public ResponseEntity<ResponseDTO> update(@ModelAttribute ProductRequestDTO productRequestDTO,@PathVariable Long id) {
 
 
-        ProductResponseDTO product = productService.create(productRequestDTO);
+        ProductResponseDTO product = productService.update(productRequestDTO, id);
 
         return ResponseEntity.status(200).body(new ResponseDTO(200, "Success", product));
 

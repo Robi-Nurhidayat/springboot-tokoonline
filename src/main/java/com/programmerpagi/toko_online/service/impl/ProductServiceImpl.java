@@ -89,17 +89,17 @@ public class ProductServiceImpl implements IProductService {
         productRepository.save(product);
 
         // untuk menyimpan gambar
-//        ImageSaveUtil.save(UPLOAD_DIR,productRequestDTO.getImage(),imageName);
+        ImageSaveUtil.save(UPLOAD_DIR,productRequestDTO.getImage(),imageName);
 
-        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            Path targetPath = uploadPath.resolve(imageName);
-            try {
-                productRequestDTO.getImage().transferTo(targetPath);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+//        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
+//            Path uploadPath = Paths.get(UPLOAD_DIR);
+//            Path targetPath = uploadPath.resolve(imageName);
+//            try {
+//                productRequestDTO.getImage().transferTo(targetPath);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/uploads/")

@@ -11,7 +11,8 @@ public class ImageSaveUtil {
 
     public static void save(String uploadDir,MultipartFile image, String imageName) {
 
-        if ( image != null && image.isEmpty()) {
+        System.out.println("blok save image jalan");
+        if ( image != null && !image.isEmpty()) {
             Path uploadPath = Paths.get(uploadDir);
             Path targetPath = uploadPath.resolve(imageName);
             try {

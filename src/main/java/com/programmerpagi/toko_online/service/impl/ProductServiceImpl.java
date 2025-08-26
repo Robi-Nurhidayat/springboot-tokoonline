@@ -2,6 +2,7 @@ package com.programmerpagi.toko_online.service.impl;
 
 import com.programmerpagi.toko_online.dto.ProductRequestDTO;
 import com.programmerpagi.toko_online.dto.ProductResponseDTO;
+import com.programmerpagi.toko_online.exception.AlreadyExistsException;
 import com.programmerpagi.toko_online.exception.ResourceNotFoundException;
 import com.programmerpagi.toko_online.model.Product;
 import com.programmerpagi.toko_online.repository.ProductRepository;
@@ -17,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -77,6 +79,13 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
 
+        Optional<Product> foundProduk = productRepository.findByNama(productRequestDTO.getNama());
+
+        if (foundProduk.isPresent()) {
+            throw new AlreadyExistsException(productRequestDTO.getNama() + " sudah ada!!!");
+        }
+
+        // membuat nama image yg akan disimpan di db
         String imageName = ImageFileNameUtil.generate(productRequestDTO.getImage());
 
         Product product = new Product();

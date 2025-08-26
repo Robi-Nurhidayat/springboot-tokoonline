@@ -9,6 +9,7 @@ import com.programmerpagi.toko_online.repository.ProductRepository;
 import com.programmerpagi.toko_online.service.IProductService;
 import com.programmerpagi.toko_online.utils.ImageFileNameUtil;
 import com.programmerpagi.toko_online.utils.ImageSaveUtil;
+import com.programmerpagi.toko_online.utils.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,14 +39,8 @@ public class ProductServiceImpl implements IProductService {
                     .path(product.getImage())
                     .toUriString();
 
-            ProductResponseDTO productResponseDTO = new ProductResponseDTO();
-            productResponseDTO.setId(product.getId());
-            productResponseDTO.setNama(product.getNama());
-            productResponseDTO.setKategori(product.getKategori());
-            productResponseDTO.setHarga(product.getHarga());
-            productResponseDTO.setStok(product.getStok());
-            productResponseDTO.setDeskripsi(product.getDeskripsi());
-            productResponseDTO.setImage(imageUrl);
+            // mapper product ke product response dto
+            ProductResponseDTO productResponseDTO = ProductMapper.toProductResponseDTO(product, imageUrl);
 
             return productResponseDTO;
         }).collect(Collectors.toList());
@@ -62,15 +57,8 @@ public class ProductServiceImpl implements IProductService {
                 .path("/uploads/")
                 .path(product.getImage()).toUriString();
 
-        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
-        productResponseDTO.setId(product.getId());
-        productResponseDTO.setNama(product.getNama());
-        productResponseDTO.setKategori(product.getKategori());
-        productResponseDTO.setHarga(product.getHarga());
-        productResponseDTO.setStok(product.getStok());
-        productResponseDTO.setDeskripsi(product.getDeskripsi());
-        productResponseDTO.setImage(imageUrl);
-
+        // mapper product ke product response dto
+        ProductResponseDTO productResponseDTO = ProductMapper.toProductResponseDTO(product, imageUrl);
 
         return productResponseDTO;
     }
@@ -100,29 +88,13 @@ public class ProductServiceImpl implements IProductService {
         // untuk menyimpan gambar
         ImageSaveUtil.save(UPLOAD_DIR,productRequestDTO.getImage(),imageName);
 
-//        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
-//            Path uploadPath = Paths.get(UPLOAD_DIR);
-//            Path targetPath = uploadPath.resolve(imageName);
-//            try {
-//                productRequestDTO.getImage().transferTo(targetPath);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/uploads/")
                 .path(imageName)
                 .toUriString();
 
-        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
-        productResponseDTO.setId(product.getId());
-        productResponseDTO.setNama(product.getNama());
-        productResponseDTO.setKategori(product.getKategori());
-        productResponseDTO.setHarga(product.getHarga());
-        productResponseDTO.setStok(product.getStok());
-        productResponseDTO.setDeskripsi(product.getDeskripsi());
-        productResponseDTO.setImage(imageUrl);
+        // mapper product ke product response dto
+        ProductResponseDTO productResponseDTO = ProductMapper.toProductResponseDTO(product, imageUrl);
         return productResponseDTO;
     }
 
@@ -157,8 +129,6 @@ public class ProductServiceImpl implements IProductService {
         }
 
 
-
-
         product.setNama(productRequestDTO.getNama());
         product.setKategori(productRequestDTO.getKategori());
         product.setHarga(productRequestDTO.getHarga());
@@ -167,31 +137,16 @@ public class ProductServiceImpl implements IProductService {
         product.setImage(imageName);
         productRepository.save(product);
 
-        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            Path targetPath = uploadPath.resolve(imageName);
-            try {
-                productRequestDTO.getImage().transferTo(targetPath);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-
+        // untuk menyimpan gambar
+        ImageSaveUtil.save(UPLOAD_DIR,productRequestDTO.getImage(),imageName);
 
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/uploads/")
                 .path(imageName)
                 .toUriString();
 
-        ProductResponseDTO productResponseDTO = new ProductResponseDTO();
-        productResponseDTO.setId(product.getId());
-        productResponseDTO.setNama(product.getNama());
-        productResponseDTO.setKategori(product.getKategori());
-        productResponseDTO.setHarga(product.getHarga());
-        productResponseDTO.setStok(product.getStok());
-        productResponseDTO.setDeskripsi(product.getDeskripsi());
-        productResponseDTO.setImage(imageUrl);
+        // mapper product ke product response dto
+        ProductResponseDTO productResponseDTO = ProductMapper.toProductResponseDTO(product, imageUrl);
         return productResponseDTO;
     }
 

@@ -7,12 +7,10 @@ import com.programmerpagi.toko_online.exception.ResourceNotFoundException;
 import com.programmerpagi.toko_online.model.Product;
 import com.programmerpagi.toko_online.repository.ProductRepository;
 import com.programmerpagi.toko_online.service.IProductService;
-import com.programmerpagi.toko_online.utils.ImageFileNameUtil;
-import com.programmerpagi.toko_online.utils.ImageSaveUtil;
+import com.programmerpagi.toko_online.utils.ImageUtil;
 import com.programmerpagi.toko_online.utils.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.nio.file.Files;
@@ -20,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,7 +71,7 @@ public class ProductServiceImpl implements IProductService {
         }
 
         // membuat nama image yg akan disimpan di db
-        String imageName = ImageFileNameUtil.generate(productRequestDTO.getImage());
+        String imageName = ImageUtil.generateImageName(productRequestDTO.getImage());
 
         Product product = new Product();
         product.setNama(productRequestDTO.getNama());
@@ -86,7 +83,7 @@ public class ProductServiceImpl implements IProductService {
         productRepository.save(product);
 
         // untuk menyimpan gambar
-        ImageSaveUtil.save(UPLOAD_DIR,productRequestDTO.getImage(),imageName);
+        ImageUtil.saveImage(UPLOAD_DIR,productRequestDTO.getImage(),imageName);
 
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/uploads/")
@@ -120,13 +117,8 @@ public class ProductServiceImpl implements IProductService {
         }
 
 
-        String imageName = "";
-        String uuid = UUID.randomUUID().toString();
-        if ( productRequestDTO.getImage() != null && !productRequestDTO.getImage().isEmpty()) {
-            imageName = uuid + "_" + productRequestDTO.getImage().getOriginalFilename().replaceAll("\\s+", "_");
-        }else {
-            imageName = uuid + "_produk.jpg";
-        }
+        // membuat nama image yg akan disimpan di db
+        String imageName = ImageUtil.generateImageName(productRequestDTO.getImage());
 
 
         product.setNama(productRequestDTO.getNama());
@@ -138,7 +130,7 @@ public class ProductServiceImpl implements IProductService {
         productRepository.save(product);
 
         // untuk menyimpan gambar
-        ImageSaveUtil.save(UPLOAD_DIR,productRequestDTO.getImage(),imageName);
+        ImageUtil.saveImage(UPLOAD_DIR,productRequestDTO.getImage(),imageName);
 
         String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/uploads/")
@@ -156,15 +148,8 @@ public class ProductServiceImpl implements IProductService {
         Product product = productRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("product","id",Long.toString(id))
         );
-        Path imageUrl = Paths.get(UPLOAD_DIR).resolve(product.getImage());
 
-        if(Files.exists(imageUrl)) {
-            try {
-                Files.delete(imageUrl);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        ImageUtil.deleteImage(UPLOAD_DIR,product.getImage());
 
         productRepository.deleteById(id);
     }

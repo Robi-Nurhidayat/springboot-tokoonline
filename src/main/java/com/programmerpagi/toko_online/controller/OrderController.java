@@ -1,9 +1,8 @@
 package com.programmerpagi.toko_online.controller;
 
-import com.programmerpagi.toko_online.dto.OrderRequestDto;
+import com.programmerpagi.toko_online.dto.OrderFromCartDto;
 import com.programmerpagi.toko_online.dto.OrderResponseDTO;
 import com.programmerpagi.toko_online.dto.ResponseDTO;
-import com.programmerpagi.toko_online.model.Order;
 import com.programmerpagi.toko_online.service.IOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,7 @@ public class OrderController {
     }
 
     @PostMapping("/orders")
-    public ResponseEntity<ResponseDTO> createOrder(@RequestBody OrderRequestDto order) {
+    public ResponseEntity<ResponseDTO> createOrder(@RequestBody OrderFromCartDto order) {
 
         System.out.println(order);
         orderService.createOrder(order);

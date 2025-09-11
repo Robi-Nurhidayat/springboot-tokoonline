@@ -1,22 +1,17 @@
 package com.programmerpagi.toko_online.service.impl;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.programmerpagi.toko_online.dto.OrderRequestDto;
+import com.programmerpagi.toko_online.dto.OrderFromCartDto;
+import com.programmerpagi.toko_online.dto.OrderLangsungDTO;
 import com.programmerpagi.toko_online.dto.OrderResponseDTO;
 import com.programmerpagi.toko_online.exception.InsufficientStockException;
 import com.programmerpagi.toko_online.exception.ResourceNotFoundException;
 import com.programmerpagi.toko_online.model.*;
 import com.programmerpagi.toko_online.repository.*;
 import com.programmerpagi.toko_online.service.IOrderService;
-import com.programmerpagi.toko_online.service.IUserService;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -66,13 +61,13 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public void createOrder(OrderRequestDto orderDto) {
+    public void createOrder(OrderFromCartDto orderDto) {
 
 
         LocalDateTime localDateTime = LocalDateTime.now();
         Order order = new Order();
 
-        OrderRequestDto orderRequestDto = orderDto;
+        OrderFromCartDto orderRequestDto = orderDto;
         User findUser = userRepository.findById(orderDto.getUserId()).orElseThrow(
                 () -> new ResourceNotFoundException("user", "id", Long.toString(orderRequestDto.getUserId()))
         );
@@ -95,8 +90,8 @@ public class OrderServiceImpl implements IOrderService {
                 orderItem.setOrder(finalOrder);
                 orderItem.setProduct(item.getProduct());
                 orderItem.setKuantity(item.getQuantity());
-                orderItem.setHarga(item.getProduct().getHarga());
-                orderItem.setNama(item.getProduct().getNama());
+                orderItem.setTotalHarga(item.getProduct().getHarga());
+//                orderItem.setNama(item.getProduct().getNama());
 
                 return orderItem;
             }).collect(Collectors.toList());
@@ -141,8 +136,8 @@ public class OrderServiceImpl implements IOrderService {
             orderItem.setOrder(newOrder);
             orderItem.setProduct(product);
             orderItem.setKuantity(orderDto.getKuantity());
-            orderItem.setHarga(product.getHarga());
-            orderItem.setNama(product.getNama());
+            orderItem.setTotalHarga(product.getHarga());
+//            orderItem.setNama(product.getNama());
             orderItemRepository.save(orderItem);
 
             // update stok
@@ -156,11 +151,41 @@ public class OrderServiceImpl implements IOrderService {
 
     }
 
-
     @Override
-    public void createOrderWithoutFromCart(Order order) {
+    public String createOrderLangsung(OrderLangsungDTO orderLangsungDTO) {
 
+        // findUser
+        User user = userRepository.findById(orderLangsungDTO.getUserId()).orElseThrow(
+                () -> new ResourceNotFoundException("User","id", Long.toString(orderLangsungDTO.getUserId()))
+        );
+
+        // find produk
+        Product product = productRepository.findById(orderLangsungDTO.getProdukId()).orElseThrow(
+                () -> new ResourceNotFoundException("Produk","id", Long.toString(orderLangsungDTO.getUserId()))
+        );
+
+
+
+        Order order = new Order();
+        order.setOrderNumber(generateOrderNumber());
+        order.setName(orderLangsungDTO.getName());
+        order.setAddress(orderLangsungDTO.getAddress());
+
+        Long totalAmount = orderLangsungDTO.getQuantity() * product.getHarga();
+        order.setTotalAmount(totalAmount);
+        order.setOrderDate(LocalDate.now());
+        Order savedOrder = orderRepository.save(order);
+
+
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrder(savedOrder);
+        orderItem.setProduct(product);
+        orderItem.setKuantity(orderLangsungDTO.getQuantity());
+        orderItem.setTotalHarga(product.getHarga() * orderLangsungDTO.getQuantity());
+
+        return "success";
     }
+
 
     public String generateOrderNumber() {
 

@@ -12,6 +12,8 @@ public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Integer kuantity;
+    private Long totalHarga;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
@@ -22,8 +24,6 @@ public class OrderItem {
     @JoinColumn(name = "product_id")
     @JsonBackReference("product-orderItems")
     private Product product;
-    private Integer kuantity;
-    private String nama;
-    private Long harga;
+
 
 }

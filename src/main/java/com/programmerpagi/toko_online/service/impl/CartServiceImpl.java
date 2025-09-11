@@ -71,20 +71,18 @@ public class CartServiceImpl implements ICartService {
                 () -> new ResourceNotFoundException("user","id", Long.toString(cartRequestDTO.getUserId()))
         );
 
-        if (product.getStok() < cartRequestDTO.getQuantity()) {
-            throw new InsufficientStockException("stok tidak mencukupi");
+
+        if (user.getCarts().size() > 0) {
+
         }
+
 
         Cart cart = new Cart();
         cart.setProduct(product);
         cart.setUser(user);
-        cart.setQuantity(cartRequestDTO.getQuantity());
         cartRepository.save(cart);
 
-//        if (cart.getId() > 0) {
-//            product.setStok(product.getStok() - cartRequestDTO.getQuantity());
-//            productRepository.save(product);
-//        }
+
 
         CartResponseDTO cartResponseDTO = new CartResponseDTO();
         cartResponseDTO.setId(cart.getId());

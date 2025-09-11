@@ -1,9 +1,12 @@
 package com.programmerpagi.toko_online.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "carts")
@@ -25,4 +28,8 @@ public class Cart {
     private Product product;
 
     private Integer quantity;
+
+    @JsonManagedReference("user-carts")
+    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade =  CascadeType.ALL)
+    private List<Cart> carts;
 }

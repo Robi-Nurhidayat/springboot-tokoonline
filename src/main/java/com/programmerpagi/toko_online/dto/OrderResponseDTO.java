@@ -1,11 +1,10 @@
 package com.programmerpagi.toko_online.dto;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,5 +16,9 @@ public class OrderResponseDTO {
     private String name;
     private String address;
     private LocalDate orderDate;
+
+    List<OrderItemResponseDTO> orderItems;
+
+    
 
 }

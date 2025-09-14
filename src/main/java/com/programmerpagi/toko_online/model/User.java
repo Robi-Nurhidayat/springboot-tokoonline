@@ -25,11 +25,9 @@ public class User {
     private String password;
     private String role;
 
-    @JsonManagedReference("user-orders")
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade =  CascadeType.ALL)
     private List<Order> orders;
 
-    @JsonManagedReference("user-carts")
     @OneToMany(mappedBy = "user", orphanRemoval = true, cascade =  CascadeType.ALL)
     private List<Cart> carts;
 

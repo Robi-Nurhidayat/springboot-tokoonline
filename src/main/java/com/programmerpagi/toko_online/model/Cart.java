@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "carts")
+@Table(name = "cart")
 @Getter @Setter
 public class Cart {
 
@@ -17,19 +17,18 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonBackReference("user-carts")
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @JsonBackReference("product-carts")
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 
     private Integer quantity;
 
-    @JsonManagedReference("user-carts")
-    @OneToMany(mappedBy = "user", orphanRemoval = true, cascade =  CascadeType.ALL)
-    private List<Cart> carts;
+    @OneToMany(mappedBy = "cart", orphanRemoval = true, cascade =  CascadeType.ALL)
+    private List<CartItem> cartItems;
 }

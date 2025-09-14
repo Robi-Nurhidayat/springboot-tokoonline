@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,18 +25,21 @@ public class Order {
     private String name;
     private String address;
     private LocalDate orderDate;
-    private Long totalAmount;
+    private BigDecimal totalAmount;
+    private String status;
 
 
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonBackReference("user-orders")
     private User user;
 
-    @OneToMany(mappedBy = "order", orphanRemoval = true, cascade =  CascadeType.ALL)
-    @JsonManagedReference("order-orderItems")
+    @OneToMany(
+            mappedBy = "order",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
     private List<OrderItem> orderItems;
-
 
 }

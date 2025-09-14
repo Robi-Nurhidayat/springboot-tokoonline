@@ -1,6 +1,7 @@
 package com.programmerpagi.toko_online.controller;
 
 import com.programmerpagi.toko_online.contants.AppConstants;
+import com.programmerpagi.toko_online.dto.LoginRequestDTO;
 import com.programmerpagi.toko_online.dto.RegisterResponseDTO;
 import com.programmerpagi.toko_online.dto.ResponseDTO;
 import com.programmerpagi.toko_online.dto.LoginResponseDTO;
@@ -51,7 +52,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody ResponseDTO.LoginRequestDTO loginRequestDTO) {
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         Authentication authentication = UsernamePasswordAuthenticationToken.unauthenticated(loginRequestDTO.getUsername(), loginRequestDTO.getPassword());
         Authentication authenticationResponse = authenticationManager.authenticate(authentication);
 

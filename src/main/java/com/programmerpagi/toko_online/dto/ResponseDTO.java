@@ -1,13 +1,11 @@
 package com.programmerpagi.toko_online.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class ResponseDTO {
 
     @JsonProperty("status_code")
@@ -17,11 +15,4 @@ public class ResponseDTO {
     @JsonProperty("data")
     private Object data;
 
-    @Setter
-    @Getter
-    public static class LoginRequestDTO {
-
-        private String username;
-        private String password;
-    }
 }

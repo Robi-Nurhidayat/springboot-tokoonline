@@ -2,6 +2,8 @@ package com.programmerpagi.toko_online.dto;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class OrderLangsungDTO {
 
@@ -9,7 +11,9 @@ public class OrderLangsungDTO {
     private Long produkId;
     private String name;
     private String address;
-    private int quantity;
+    private Integer quantity;
+
+
 
 
 }

@@ -9,10 +9,12 @@ import com.programmerpagi.toko_online.service.IOrderService;
 import com.programmerpagi.toko_online.utils.TransactionNumberGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -155,17 +157,30 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
+    @Transactional
     public OrderLangsungResponseDTO createOrderLangsung(OrderLangsungDTO orderLangsungDTO) {
+
+        // 1. Validasi input dasar
+        if (orderLangsungDTO.getQuantity() <= 0) {
+            throw new InsufficientStockException("Minimal jumlah pembelian harus 1.");
+        }
 
         // findUser
         User user = userRepository.findById(orderLangsungDTO.getUserId()).orElseThrow(
                 () -> new ResourceNotFoundException("User","id", Long.toString(orderLangsungDTO.getUserId()))
         );
 
+        System.out.println("username " + user.getName());
+
         // find produk
         Product product = productRepository.findById(orderLangsungDTO.getProdukId()).orElseThrow(
                 () -> new ResourceNotFoundException("Produk","id", Long.toString(orderLangsungDTO.getUserId()))
         );
+
+        // 3. Validasi stok produk
+        if (product.getStok() < orderLangsungDTO.getQuantity()) {
+            throw new InsufficientStockException("Stok produk tidak mencukupi.");
+        }
 
 
 
@@ -186,9 +201,9 @@ public class OrderServiceImpl implements IOrderService {
         orderItem.setProduct(product);
         orderItem.setQuantity(orderLangsungDTO.getQuantity());
         orderItem.setTotalHarga(product.getHarga().multiply(BigDecimal.valueOf(orderLangsungDTO.getQuantity())));
-
         OrderItem orderItemSaved = orderItemRepository.save(orderItem);
 
+        // update stok product
         product.setStok(product.getStok() - orderItem.getQuantity());
         productRepository.save(product);
 
@@ -200,16 +215,20 @@ public class OrderServiceImpl implements IOrderService {
         orderItemResponseDTO.setProductName(product.getNama());
         orderItemResponseDTO.setTotalHarga(orderItemSaved.getTotalHarga());
 
+        List<OrderItemResponseDTO> orderItemResponseDTOList = new ArrayList<>();
+        orderItemResponseDTOList.add(orderItemResponseDTO);
+
 
         OrderLangsungResponseDTO responseDTO = new OrderLangsungResponseDTO();
         responseDTO.setId(savedOrder.getId());
-        responseDTO.setUserId(savedOrder.getUser().getId());
+        responseDTO.setUserId(user.getId());
         responseDTO.setOrderNumber(savedOrder.getOrderNumber());
         responseDTO.setName(savedOrder.getName());
         responseDTO.setAddress(savedOrder.getAddress());
         responseDTO.setOrderDate(savedOrder.getOrderDate());
         responseDTO.setStatus(savedOrder.getStatus());
         responseDTO.setTotalAmount(savedOrder.getTotalAmount());
+        responseDTO.setProduct(orderItemResponseDTOList);
 
         return responseDTO;
     }

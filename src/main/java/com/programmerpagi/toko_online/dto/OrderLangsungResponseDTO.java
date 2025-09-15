@@ -19,7 +19,7 @@ public class OrderLangsungResponseDTO {
     private String status;
 
 
-    private List<OrderItemResponseDTO> orderItemResponseDTOS;
+    private List<OrderItemResponseDTO> product;
 
 
 

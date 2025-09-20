@@ -3,6 +3,7 @@ package com.programmerpagi.toko_online.service.impl;
 import com.programmerpagi.toko_online.dto.*;
 import com.programmerpagi.toko_online.exception.InsufficientStockException;
 import com.programmerpagi.toko_online.exception.ResourceNotFoundException;
+import com.programmerpagi.toko_online.mapper.OrderMapper;
 import com.programmerpagi.toko_online.model.*;
 import com.programmerpagi.toko_online.repository.*;
 import com.programmerpagi.toko_online.service.IOrderService;
@@ -219,16 +220,8 @@ public class OrderServiceImpl implements IOrderService {
         orderItemResponseDTOList.add(orderItemResponseDTO);
 
 
-        OrderLangsungResponseDTO responseDTO = new OrderLangsungResponseDTO();
-        responseDTO.setId(savedOrder.getId());
-        responseDTO.setUserId(user.getId());
-        responseDTO.setOrderNumber(savedOrder.getOrderNumber());
-        responseDTO.setName(savedOrder.getName());
-        responseDTO.setAddress(savedOrder.getAddress());
-        responseDTO.setOrderDate(savedOrder.getOrderDate());
-        responseDTO.setStatus(savedOrder.getStatus());
-        responseDTO.setTotalAmount(savedOrder.getTotalAmount());
-        responseDTO.setProduct(orderItemResponseDTOList);
+        OrderLangsungResponseDTO responseDTO = OrderMapper.ToResponseOrderLangsung(savedOrder, orderItemResponseDTOList, user);
+
 
         return responseDTO;
     }

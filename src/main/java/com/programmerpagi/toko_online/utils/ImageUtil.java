@@ -17,8 +17,6 @@ public final class ImageUtil {
         String uuid = UUID.randomUUID().toString();
         if ( image != null && !image.isEmpty()) {
             imageName = uuid + "_" + image.getOriginalFilename().replaceAll("\\s+", "_");
-        }else {
-            imageName = uuid + "_produk.jpg";
         }
 
         return imageName;
@@ -39,18 +37,23 @@ public final class ImageUtil {
         }
     }
 
-    public static void deleteImage(String uploadDir,  String imageName) {
-
+    public static void deleteImage(String uploadDir, String imageName) {
         System.out.println("blok delete image jalan");
 
-        Path imageUrl = Paths.get(uploadDir).resolve(imageName);
+        if (imageName != null && !imageName.isBlank()) {
+            Path imageUrl = Paths.get(uploadDir).resolve(imageName);
 
-        if(Files.exists(imageUrl)) {
-            try {
-                Files.delete(imageUrl);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (Files.exists(imageUrl)) {
+                try {
+                    Files.delete(imageUrl);
+                    System.out.println("File berhasil dihapus: " + imageUrl);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("File tidak ditemukan: " + imageUrl);
             }
         }
     }
+
 }
